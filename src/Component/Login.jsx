@@ -1,32 +1,55 @@
-import React from 'react'
-import { Container } from 'react-bootstrap'
+import React,{useState} from 'react'
+import { Button } from 'react-bootstrap'
+import {Form} from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
+import {toast} from "react-toastify"
+import AxiosService from '../utils/ApiService'
 
 
 function Login() {
+    
+    let [email,setEmail] = useState("")
+    let [password,setPassword] = useState("")
     let navigate = useNavigate()
+
+    let handleLogin = async()=>{
+        try {
+            let res = await AxiosService.post(`/user/login`,{
+                email,
+                password
+            })
+            if(res.status===200){
+                toast.success(res.data.message)
+                sessionStorage.setItem('user',JSON.stringify(res.data.user))
+                navigate('/dashboard')
+            }
+        } 
+        catch (error) {
+            toast.error(error.response.data.message)
+        }
+    }
   return <>
-  <Container>
-  <form>
-    <center><div><h1>Login</h1></div></center>
-  <div className="mb-3">
-    
-    <label for="exampleInputEmail1" className="form-label">Email address</label>
-    <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
-    
+ <div className='container'>
+    <h1 style={{textAlign:"center"}}>Login Here!</h1>
+  <Form>
+      <Form.Group className="mb-3">
+        <Form.Label>Email address</Form.Label>
+        <Form.Control type="email" placeholder="Enter email" onChange={(e)=>setEmail(e.target.value)}/>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Password</Form.Label>
+        <Form.Control type="password" placeholder="Password" onChange={(e)=>setPassword(e.target.value)}/>
+      </Form.Group>
+      <center><Button variant="primary" onClick={handleLogin}>
+        Submit
+      </Button>
+      <div className='pointer' onClick={()=>navigate('/forgotpassword')}>Forgot Password</div>
+      <br/>
+      <div className='pointer' onClick={()=>navigate('/signup')}>New User? Signup</div>
+      </center>
+    </Form>
   </div>
-  <div className="mb-3">
-    <label for="exampleInputPassword1" className="form-label">Password</label>
-    <input type="password" className="form-control" id="exampleInputPassword1" />
-  </div>
-<center>
-    <div>
-  <button type="submit" className="btn btn-primary" onClick={()=>navigate("/dashboard")}>Submit</button></div><br/>
-<div className='pointer' onClick={()=> navigate("/forgotpassword")}>Forgot Password </div><br />
-<div className='pointer' onClick={()=> navigate("/signup")}> New User? Sign Up </div>
-  </center>
-</form>
-        </Container>
     </>
   
 }

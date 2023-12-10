@@ -1,27 +1,40 @@
-import React from 'react'
-import { Container } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
+import React,{useState} from 'react'
+import { Button } from 'react-bootstrap'
+import {Form} from 'react-bootstrap'
+import { useNavigate} from 'react-router-dom'
+import {toast} from 'react-toastify'
+import AxiosService from '../utils/ApiService'
 
 function ForgetPassword() {
+  let [email,setEmail]=useState("")
     let navigate = useNavigate()
+    let Forgot = async(e)=>{
+      try {
+        let res = await AxiosService.post("/user/forget",{email})
+        if(res.status===200){
+          toast.success("Email Sent")
+          navigate('/')
+          
+        }
+      } catch (error) {
+        toast.error(error.response.data.message)
+      }
+    }
   return <>
- 
-  <Container>
-  <form>
-    <center><div><h1>Forgot Password</h1></div></center>
-  <div className="mb-3">
-    
-    <label for="exampleInputEmail1" className="form-label">Email address</label>
-    <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
-    
-  </div>
-  <div>
-  <center><button type="submit" className="btn btn-primary" onClick={()=> navigate("/resetpassword")}>Forgot Password</button></center>
-  </div>
-  
-</form>
-    </Container>
+ <div className='container'>
+    <h1 style={{textAlign:"center"}}>Forget Password</h1>
+  <Form>
+      <Form.Group className="mb-3">
+        <Form.Label>Email address</Form.Label>
+        <Form.Control type="email" placeholder="Enter email" onChange={(e)=>setEmail(e.target.value)}/>
+      </Form.Group>
+      <center><Button variant="primary" onClick={Forgot}>
+        Submit
+      </Button>
+      </center>
+    </Form>
+  </div>
   </>
 }
 
-export default ForgetPassword
+export default ForgetPassword
